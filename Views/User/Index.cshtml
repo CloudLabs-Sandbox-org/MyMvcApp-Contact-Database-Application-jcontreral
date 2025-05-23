@@ -9,6 +9,13 @@
 <p>
     @Html.ActionLink("Create New", "Create", "User")
 </p>
+
+@* Agrega esto al inicio de tu archivo Index.cshtml *@
+<form asp-action="Search" method="get" class="mb-3">
+    <input type="text" name="query" placeholder="Buscar usuario..." class="form-control" style="width: 300px; display: inline-block;" />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
 <table class="table">
     <tr>
         <th>
