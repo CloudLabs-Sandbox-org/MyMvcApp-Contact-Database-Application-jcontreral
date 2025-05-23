@@ -4,15 +4,24 @@
   "parameters": {
     "appServicePlanName": {
       "type": "string",
-      "defaultValue": "myAppServicePlan"
+      "defaultValue": "myAppServicePlan",
+      "metadata": {
+        "description": "Name of the App Service Plan."
+      }
     },
     "webAppName": {
       "type": "string",
-      "defaultValue": "my-mvc-app"
+      "defaultValue": "my-mvc-app",
+      "metadata": {
+        "description": "Name of the Web App."
+      }
     },
     "location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]"
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for the resources."
+      }
     }
   },
   "resources": [
@@ -22,7 +31,7 @@
       "name": "[parameters('appServicePlanName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "F1",
+        "name": "B1", 
         "tier": "Free"
       },
       "properties": {
@@ -38,14 +47,52 @@
         "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
-      }
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "siteConfig": {
+          "ftpsState": "Disabled"
+        }
+      },
+      "resources": [
+        {
+          "type": "config/authsettingsV2",
+          "apiVersion": "2022-03-01",
+          "name": "authsettingsV2",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "properties": {
+            "platform": {
+              "enabled": true
+            },
+            "globalValidation": {
+              "unauthenticatedClientAction": "RedirectToLoginPage"
+            },
+            "identityProviders": {
+              "azureActiveDirectory": {
+                "enabled": false
+              }
+            },
+            "login": {
+              "routes": {},
+              "tokenStore": {
+                "enabled": false
+              }
+            },
+            "httpSettings": {
+              "requireHttps": true
+            }
+          }
+        }
+      ]
     }
   ],
   "outputs": {
     "webAppUrl": {
       "type": "string",
-      "value": "[concat('https://', parameters('webAppName'), '.azurewebsites.net')]"
+      "value": "[concat('https://', parameters('webAppName'), '.azurewebsites.net')]",
+      "metadata": {
+        "description": "The URL of the deployed Web App."
+      }
     }
   }
 }
